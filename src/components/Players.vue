@@ -1,7 +1,10 @@
 <template>
     <div>
         <h1> Players</h1>
-
+        <router-link to="/" class="disable_link">
+            <v-btn outlined color="blue-grey" large>RETOUR</v-btn>
+        </router-link>
+        <v-divider class="mt-5"></v-divider>
 
         <v-form class="mt-16 text-center mx-5" @submit.prevent="addPlayers">
             <v-row>
@@ -18,30 +21,12 @@
                 </v-col>
             </v-row>
         </v-form>
+        <v-divider class="mb-5"></v-divider>
         <v-main>
             <v-row>
                 <v-col class="playerCard" v-for="(player,i) in players" :key="i" sm="2">
-                    <v-card>
-                        <v-list>
-                            <v-list-item-group>
-                                <v-list-item>
-                                    <v-list-item-icon>
-                                        <v-icon v-if="player.role === 'H'" color="green">mdi-hospital-box</v-icon>
-                                        <v-icon v-if="player.role === 'T'" color="blue">mdi-shield</v-icon>
-                                        <v-icon v-if="player.role === 'D'" color="red">mdi-sword</v-icon>
-                                    </v-list-item-icon>
-                                    <v-list-item-content>
-                                        <v-list-item-title v-text="player.pseudo"></v-list-item-title>
-                                    </v-list-item-content>
-                                    <v-list-item-action>
-                                        <v-btn color="red" icon small @click="deletePlayer(i)" >
-                                            <v-icon>mdi-close-circle</v-icon>
-                                        </v-btn>
-                                    </v-list-item-action>
-                                </v-list-item>
-                            </v-list-item-group>
-                        </v-list>
-                    </v-card>
+                    <PlayerVue v-bind:player="player" v-bind:index="i" delete-enable="true"
+                               v-on:deletePlayer="deletePlayer"/>
                 </v-col>
             </v-row>
         </v-main>
@@ -49,37 +34,40 @@
 </template>
 
 <script>
+    import playerService from "@/service/playerService";
+    import PlayerVue from "@/components/PlayerVue";
+
     export default {
         name: "Players",
+        components: {PlayerVue},
         data: () => ({
             roles: [{text: 'Tank', value: 'T'}, {text: 'DPS', value: 'D'}, {text: 'Heal', value: 'H'}],
-            players: [
-                {role: 'H', pseudo: 'Draésia'},
-
-            ],
             form: {
                 role: '',
                 pseudo: '',
             }
         }),
+        computed: {
+            players: () => {
+                return playerService.players;
+            }
+        },
         methods: {
             addPlayers() {
 
-                console.log(this.form.role[0]);
-                console.log(this.form.pseudo);
-
-                this.players.push({
+                playerService.players.push({
                     role: this.form.role[0],
                     pseudo: this.form.pseudo
                 });
                 this.clean()
             },
-            clean(){
+            clean() {
                 this.form.role = '';
                 this.form.pseudo = '';
             },
-            deletePlayer(id){
-                this.players.splice(id,1)
+            deletePlayer(id) {
+                playerService.players.splice(id, 1)
+                this.$forceUpdate()
             }
         }
     }

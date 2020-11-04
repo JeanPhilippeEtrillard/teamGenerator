@@ -23,6 +23,8 @@
     #app {
         text-align: center;
     }
-
+    .disable_link{
+        text-decoration: none !important;
+    }
 
 </style>
