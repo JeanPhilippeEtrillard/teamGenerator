@@ -61,10 +61,11 @@
                     var healIdx = Math.floor(Math.random() * (healerList.length))
                     var dpsListTmp = [];
 
-                    console.log(sliceDps)
-                    for (let i = 0; ((!Number.isInteger(sliceDps) && i < 3) || (Number.isInteger(sliceDps) && i < sliceDps && i < 3)) && i <= dpsList.length;
+                    for (let i = 0; ((!Number.isInteger(sliceDps) && i < 3) || (Number.isInteger(sliceDps) && i < sliceDps && i < 3));
                          i++
                     ) {
+                        console.log("i : " + i)
+                        console.log("size : " + dpsList.length)
                         var dpsIdx = Math.floor(Math.random() * (dpsList.length))
                         dpsListTmp.push(dpsList[dpsIdx]);
                         dpsList.splice(dpsIdx, 1)
