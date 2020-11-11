@@ -6,7 +6,10 @@
                     <v-list-item-content>
                         <v-list-item-title v-text="player.pseudo" class="playerName"></v-list-item-title>
                     </v-list-item-content>
-                    <v-list-item-action v-if="deleteEnable">
+                    <v-list-item-action v-if="actions">
+                        <v-btn color="white" icon small @click="$emit('modifyPlayer',index)">
+                            <v-icon>mdi-pencil-circle-outline</v-icon>
+                        </v-btn>
                         <v-btn color="red" icon small @click="$emit('deletePlayer',index)">
                             <v-icon>mdi-close-circle</v-icon>
                         </v-btn>
@@ -20,7 +23,7 @@
 <script>
     export default {
         name: "PlayerVue",
-        props: ['player', 'index', 'deleteEnable'],
+        props: ['player', 'index', 'actions'],
         computed: {
             classPlayer: function () {
                 let tank;
