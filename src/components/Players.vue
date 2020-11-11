@@ -54,9 +54,8 @@
         },
         methods: {
             addPlayers() {
-
                 playerService.players.push({
-                    role: this.form.role[0],
+                    role: this.form.role,
                     pseudo: this.form.pseudo
                 });
                 this.clean()

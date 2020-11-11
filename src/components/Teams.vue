@@ -49,38 +49,144 @@
         }),
         methods: {
             generateTeams() {
-                var healerList = _.filter(playerService.players, {role: 'H'});
-                var dpsList = _.filter(playerService.players, {role: 'D'});
-                var tankList = _.filter(playerService.players, {role: 'T'});
+                var healerList = _.filter(playerService.players, function (player) {
+                    return player.role.includes("H")
+                });
+                var dpsList = _.filter(playerService.players, function (player) {
+                    return player.role.includes("D")
+                })
+                var tankList = _.filter(playerService.players, function (player) {
+                    return player.role.includes("T")
+                });
+                this.harmonized(healerList, tankList, dpsList);
 
-
-                var nbTeam = Math.max(healerList.length, tankList.length, dpsList.length % 3)
+                var nbTeam = Math.max(healerList.length, tankList.length, Math.round(dpsList.length / 3));
                 var sliceDps = dpsList.length / nbTeam;
                 for (let nb = 0; nb < nbTeam; nb++) {
-                    var tankIdx = Math.floor(Math.random() * (tankList.length))
-                    var healIdx = Math.floor(Math.random() * (healerList.length))
+                    var tankIdx = Math.floor(Math.random() * (tankList.length));
+                    var tank = tankList[tankIdx];
+                    this.filtrerList(tank, healerList, dpsList);
+                    var healIdx = Math.floor(Math.random() * (healerList.length));
+                    var heal = healerList[healIdx];
+                    this.filtrerList(heal, tankList, dpsList);
                     var dpsListTmp = [];
 
                     for (let i = 0; ((!Number.isInteger(sliceDps) && i < 3) || (Number.isInteger(sliceDps) && i < sliceDps && i < 3));
                          i++
                     ) {
-                        console.log("i : " + i)
-                        console.log("size : " + dpsList.length)
-                        var dpsIdx = Math.floor(Math.random() * (dpsList.length))
-                        dpsListTmp.push(dpsList[dpsIdx]);
+                        var dpsIdx = Math.floor(Math.random() * (dpsList.length));
+                        var dps = dpsList[dpsIdx];
+                        this.filtrerList(dps, healerList, tankList);
+                        dpsListTmp.push(dps);
                         dpsList.splice(dpsIdx, 1)
                     }
 
                     var team = {
-                        tank: tankList[tankIdx],
-                        heal: healerList[healIdx],
+                        tank: tank,
+                        heal: heal,
                         dps: dpsListTmp
                     }
-                    this.teams.push(team)
-                    tankList.splice(tankIdx, 1)
+                    this.teams.push(team);
+                    tankList.splice(tankIdx, 1);
                     healerList.splice(healIdx, 1)
                 }
+
+
                 this.$forceUpdate();
+            },
+            filtrerList() {
+                if (arguments.length >= 2) {
+                    if (arguments[0] !== undefined) {
+                        let playerName = arguments[0].pseudo;
+                        for (let i = 1; i < arguments.length; i++) {
+                            let idx = _.findIndex(arguments[i], function (player) {
+                                return player.pseudo === playerName;
+                            });
+                            if (idx >= 0) {
+                                arguments[i].splice(idx, 1)
+                            }
+
+                        }
+                    }
+                }
+
+            },
+            harmonized(healList, tankList, dpsList) {
+                this.harmonizedTank(healList, tankList, dpsList);
+                this.harmonizedHeal(healList, tankList, dpsList);
+                this.harmonizedDps(healList, tankList, dpsList);
+            },
+            harmonizedTank(healList, tankList, dpsList) {
+                let tankSize = tankList.length;
+                let healSize = healList.length;
+                let dpsSize = Math.round(dpsList.length / 3);
+
+                if (tankSize > healSize && tankSize > dpsSize) {
+                    let tankMultiRoleSize = _.filter(tankList, function (player) {
+                        return player.role.includes("T") && player.role.length > 1;
+                    });
+                    if (tankMultiRoleSize.length > 0) {
+                        for (let i = 0; i < tankMultiRoleSize.length && i < Math.max(healSize, dpsSize); i++) {
+                            let tankIdx = Math.floor(Math.random() * (tankMultiRoleSize.length));
+                            let tank = tankMultiRoleSize[tankIdx];
+                            this.filtrerList(tank, tankList)
+                        }
+                        for(let i = 0;  i < tankMultiRoleSize.length ; i++){
+                            let tankIdx = Math.floor(Math.random() * (tankMultiRoleSize.length));
+                            let tank = tankMultiRoleSize[tankIdx];
+                            this.filtrerList(tank, healList)
+                            this.filtrerList(tank, dpsList)
+                        }
+                    }
+                }
+            },
+            harmonizedHeal(healList, tankList, dpsList) {
+                let tankSize = tankList.length;
+                let healSize = healList.length;
+                let dpsSize = Math.round(dpsList.length / 3);
+
+                if (healSize > tankSize && healSize > dpsSize) {
+                    let healMultiRoleSize = _.filter(healList, function (player) {
+                        return player.role.includes("H") && player.role.length > 1;
+                    });
+                    if (healMultiRoleSize.length > 0) {
+                        for (let i = 0; i < healMultiRoleSize.length && i < Math.max(tankSize, dpsSize); i++) {
+                            let healIdx = Math.floor(Math.random() * (healMultiRoleSize.length));
+                            let heal = healMultiRoleSize[healIdx];
+                            this.filtrerList(heal, healList)
+                        }
+                        for(let i = 0;  i < healMultiRoleSize.length ; i++){
+                            let healIdx = Math.floor(Math.random() * (healMultiRoleSize.length));
+                            let heal = healMultiRoleSize[healIdx];
+                            this.filtrerList(heal, tankList)
+                            this.filtrerList(heal, dpsList)
+                        }
+                    }
+                }
+            },
+            harmonizedDps(healList, tankList, dpsList) {
+                let tankSize = tankList.length;
+                let healSize = healList.length;
+                let dpsSize = Math.round(dpsList.length / 3);
+
+                if (dpsSize > tankSize && dpsSize > healSize) {
+                    let dpsMultiRoleSize = _.filter(healList, function (player) {
+                        return player.role.includes("D") && player.role.length > 1;
+                    });
+                    if (dpsMultiRoleSize.length > 0) {
+                        for (let i = 0; i < dpsMultiRoleSize.length && i < Math.max(tankSize, healSize); i++) {
+                            let dpsIdx = Math.floor(Math.random() * (dpsMultiRoleSize.length));
+                            let dps = dpsMultiRoleSize[dpsIdx];
+                            this.filtrerList(dps, dpsSize)
+                        }
+                        for(let i = 0;  i < dpsMultiRoleSize.length ; i++){
+                            let dpsIdx = Math.floor(Math.random() * (dpsMultiRoleSize.length));
+                            let dps = dpsMultiRoleSize[dpsIdx];
+                            this.filtrerList(dps, tankList)
+                            this.filtrerList(dps, healList)
+                        }
+                    }
+                }
             },
             clear() {
                 this.teams.splice(0, this.teams.length);

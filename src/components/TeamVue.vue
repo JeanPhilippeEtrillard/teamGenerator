@@ -47,5 +47,6 @@
 
     .playerList {
         width: 100%;
+        margin-bottom: 1px;
     }
 </style>
