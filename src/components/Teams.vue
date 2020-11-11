@@ -174,10 +174,11 @@
                         return player.role.includes("D") && player.role.length > 1;
                     });
                     if (dpsMultiRoleSize.length > 0) {
-                        for (let i = 0; i < dpsMultiRoleSize.length && i < Math.max(tankSize, healSize); i++) {
+                        for (let i = 0; i < dpsMultiRoleSize.length && dpsSize >= Math.max(tankSize, healSize); i++) {
                             let dpsIdx = Math.floor(Math.random() * (dpsMultiRoleSize.length));
                             let dps = dpsMultiRoleSize[dpsIdx];
                             this.filtrerList(dps, dpsSize)
+                            dpsSize = Math.round(dpsList.length / 3);
                         }
                         for(let i = 0;  i < dpsMultiRoleSize.length ; i++){
                             let dpsIdx = Math.floor(Math.random() * (dpsMultiRoleSize.length));
