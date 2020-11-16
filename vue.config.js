@@ -1,4 +1,8 @@
 module.exports = {
+
+    publicPath: process.env.NODE_ENV === 'production'
+        ? '/teamGenerator/'
+        : '/',
     configureWebpack: (config) => {
         config.module.rules.push({
             test: /\.s(c|a)ss$/,
